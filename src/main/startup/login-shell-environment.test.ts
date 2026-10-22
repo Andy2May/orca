@@ -117,6 +117,18 @@ describe('resolveLoginShellEnvironment', () => {
     expect(pathValue).toBe('C:\\Users\\duyen\\AppData\\Local\\agy\\bin;D:\\other\\bin')
   })
 
+  it('normalizes POSIX drive paths when PATH starts with a relative entry and cygpath is absent', () => {
+    const rawOutput = Buffer.concat([
+      Buffer.from(`\0__ORCA_LOGIN_SHELL_ENV_START__\0`),
+      Buffer.from('USER=duyen\0PATH=.:/c/Users/duyen/AppData/Local/agy/bin\0'),
+      Buffer.from(`\0__ORCA_LOGIN_SHELL_ENV_END__\0`)
+    ])
+    const env = parsePosixEnvironment(rawOutput, { platform: 'win32' })
+    expect(env).not.toBeNull()
+    const pathValue = env?.PATH ?? env?.Path
+    expect(pathValue).toBe('.;C:\\Users\\duyen\\AppData\\Local\\agy\\bin')
+  })
+
   it('preserves native POSIX PATH on non-Windows platforms', () => {
     const rawOutput = Buffer.concat([
       Buffer.from(`\0__ORCA_LOGIN_SHELL_ENV_START__\0`),

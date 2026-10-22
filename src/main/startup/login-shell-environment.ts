@@ -146,7 +146,11 @@ export function parsePosixEnvironment(
       const rawPath = Object.entries(environment).find(
         ([key]) => key.toLowerCase() === 'path'
       )?.[1]
-      if (rawPath && rawPath.startsWith('/')) {
+      if (
+        rawPath &&
+        !rawPath.includes(';') &&
+        (rawPath.startsWith('/') || /(?:^|:)\/[a-zA-Z]\//.test(rawPath))
+      ) {
         win32Path = normalizePosixPathToWin32(rawPath)
       }
     }
